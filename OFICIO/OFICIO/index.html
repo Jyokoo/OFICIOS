@@ -116,7 +116,7 @@
        aria-modal="true" role="dialog">
     
     <div id="modalBox"
-         class="modal-card relative w-full max-w-md bg-white border-2 border-black p-5 sm:p-6 text-black cursor-default">
+         class="modal-card relative w-full max-w-md bg-white border-2 border-black p-5 sm:p-6 text-black cursor-default max-h-[85vh] overflow-y-auto">
       
       <!-- Etiqueta superior de nivel -->
       <div class="flex items-center justify-between border-b border-black pb-2.5 mb-3">
@@ -143,7 +143,7 @@
 
       <!-- Descripción detallada -->
       <p id="modalDescription" class="text-sm sm:text-[15px] leading-relaxed text-neutral-900">
-        La unión entre el saber trabajar los materiales y el gesto físico automatizado en los sentidos.
+        El oficio se aprende principalmente haciendo, observando y practicando.
       </p>
 
       <!-- Nota sutil de cierre al hacer clic fuera -->
@@ -163,7 +163,7 @@
          class="modal-card relative w-full max-w-xl bg-white border-2 border-black p-6 sm:p-8 text-black cursor-default max-h-[88vh] overflow-y-auto">
       <div class="flex items-center justify-between border-b-2 border-black pb-3 mb-4">
         <span class="text-xs font-mono-tech uppercase tracking-widest font-bold">Telar Contemporáneo · Patrimonio Vivo</span>
-        <span class="text-xs font-mono-tech border border-black px-2 py-0.5">
+       
       </div>
 
       <h2 class="text-xl sm:text-2xl font-bold tracking-tight mb-4">
@@ -174,8 +174,7 @@
         <p>
           Esta interacción busca transformar el patrimonio cultural en una experiencia tangible, metaforizando de manera intuitiva cómo los oficios evolucionan y se preservan al entrelazarse a través de las generaciones.
         </p>
-        
-      
+       
       </div>
 
       <div class="mt-6 pt-4 border-t border-black flex flex-col sm:flex-row items-center justify-between gap-3">
@@ -294,70 +293,70 @@
         level: 'Fusión Doble · 2 Conceptos',
         conceptsText: 'Técnica manual + Memoria corporal',
         title: 'Aprendizaje de contacto',
-        description: 'La unión entre el saber trabajar los materiales y el gesto físico automatizado en los sentidos. Es el oficio en acción pura, donde la mano "piensa" sola al transformar la materia.'
+        description: 'El oficio se aprende principalmente haciendo, observando y practicando. A través del trabajo con materiales como la madera, el metal o los textiles, las personas van adquiriendo experiencia y desarrollando habilidades con sus manos. La repetición de los movimientos permite que el cuerpo aprenda, reconozca los materiales y sepa cómo trabajarlos. Así, con el tiempo, cada gesto se vuelve más natural y preciso, transformando la práctica diaria en conocimiento y experiencia.'
       },
       [makeKey(['TM', 'IP'])]: {
         num: 2,
         level: 'Fusión Doble · 2 Conceptos',
         conceptsText: 'Técnica manual + Identidad propia',
         title: 'Sello de Autor',
-        description: 'Usar el dominio técnico del material para tomar decisiones estéticas o funcionales únicas; cuando dos personas usan la misma técnica pero el resultado refleja la agencia personal de una sola.'
+        description: 'Cuando una persona conoce bien los materiales y sabe trabajarlos, puede comenzar a darles su propio estilo. Cada decisión, detalle y forma de trabajar refleja su personalidad y manera de crear. Así, cada pieza deja de ser solo un objeto funcional y se convierte en algo único, que transmite la esencia y la identidad de quien lo hizo.'
       },
       [makeKey(['TM', 'TG'])]: {
         num: 3,
         level: 'Fusión Doble · 2 Conceptos',
         conceptsText: 'Técnica manual + Traspaso generacional',
         title: 'Destreza Hereditaria',
-        description: 'Los procedimientos, trucos y métodos probados para transformar un material que se codifican y se transmiten de maestros a aprendices.'
+        description: 'Los oficios tradicionales mantienen su valor gracias a los conocimientos y técnicas que se transmiten de generación en generación. A través de la práctica y la enseñanza, los maestros comparten su experiencia con nuevos aprendices, manteniendo vivas estas formas de trabajo. Repetir una técnica no significa quedarse en el pasado, sino conservar un conocimiento que puede seguir aprendiendo, adaptándose y evolucionando con el tiempo.'
       },
       [makeKey(['TM', 'OR'])]: {
         num: 4,
         level: 'Fusión Doble · 2 Conceptos',
         conceptsText: 'Técnica manual + Orígenes',
         title: 'Raíz del Hacer',
-        description: 'El estudio y rescate de cómo se transformaban los materiales en el pasado y cómo han mutado las herramientas y procesos desde el officium antiguo y los gremios.'
+        description: 'La palabra oficio tiene su origen en el latín y está relacionada con la idea de hacer y crear algo útil. Desde hace siglos, los oficios como la carpintería, la herrería o la albañilería han desarrollado sus propias herramientas y formas de trabajo. Estos conocimientos han pasado de generación en generación y, aunque la llegada de las máquinas cambió la manera de producir, los trabajos manuales han logrado mantenerse vivos, adaptándose a los nuevos tiempos sin perder sus raíces.'
       },
       [makeKey(['MC', 'IP'])]: {
         num: 5,
         level: 'Fusión Doble · 2 Conceptos',
         conceptsText: 'Memoria corporal + Identidad propia',
         title: 'Firma Gestual',
-        description: 'La huella íntima del cuerpo en el objeto. La presión de los dedos, el ritmo del golpe o la postura personal que quedan impresos como identidad en la pieza creada.'
+        description: 'Nuestra relación con los objetos no es solo visual o funcional, sino profundamente sensorial y corporal. La postura al trabajar, la presión de los dedos o el ritmo del golpe imprimen una huella íntima en la pieza creada o reparada. Ya sea un taller por ejemplo, en si el cuerpo funciona como el medio a través del cual las personas dejan de ser consumidoras pasivas y tejen su propia biografía sobre el mundo material.'
       },
       [makeKey(['MC', 'TG'])]: {
         num: 6,
         level: 'Fusión Doble · 2 Conceptos',
         conceptsText: 'Memoria corporal + Traspaso generacional',
         title: 'Aprendizaje Vicario',
-        description: 'El corazón de la relación entre generaciones: aprender observando el cuerpo del otro, imitando su postura y repitiendo el gesto hasta incorporarlo.'
+        description: 'Antiguamente, los oficios se aprendían principalmente observando y trabajando junto a personas con más experiencia. Los aprendices miraban cómo sus maestros utilizaban las herramientas, trabajaban los materiales y realizaban cada movimiento, para luego intentar repetirlo. Con la práctica, esos conocimientos se iban incorporando de forma natural. Así, las técnicas y experiencias se transmitían de una generación a otra, manteniendo vivo un aprendizaje que no solo se enseña con palabras, sino también a través de la práctica y la experiencia.'
       },
       [makeKey(['MC', 'OR'])]: {
         num: 7,
         level: 'Fusión Doble · 2 Conceptos',
         conceptsText: 'Memoria corporal + Orígenes',
         title: 'Evolución Histórica',
-        description: 'Cómo los gestos humanos, los sentidos y la destreza física frente a las herramientas han cambiado (o permanecido intactos) a lo largo de la historia social del trabajo.'
+        description: 'A lo largo del tiempo, las formas de trabajar y las herramientas han ido cambiando, pero el cuerpo sigue siendo fundamental en los oficios. Desde los antiguos talleres hasta los espacios de trabajo actuales, las personas han aprendido a adaptar sus movimientos, habilidades y formas de utilizar las herramientas. Así, cada oficio conserva conocimientos que se han transmitido a través de los años y que siguen evolucionando junto con las nuevas formas de trabajar.'
       },
       [makeKey(['IP', 'TG'])]: {
         num: 8,
         level: 'Fusión Doble · 2 Conceptos',
         conceptsText: 'Identidad propia + Traspaso generacional',
         title: 'Linaje Creativo',
-        description: 'Cómo un aprendiz recibe una herencia cultural, la pasa por el filtro de sus propias experiencias y decisiones, y la devuelve transformada a la siguiente generación.'
+        description: 'Heredar un oficio no significa hacer siempre las cosas de la misma manera, sino aprender de quienes estuvieron antes y darle un toque personal. Cada persona recibe conocimientos y técnicas que vienen de su familia o de otras generaciones, pero los adapta según sus propias ideas y experiencias. Así, los oficios se mantienen vivos a través del tiempo, combinando las tradiciones del pasado con nuevas formas de crear y expresar la identidad de cada persona.'
       },
       [makeKey(['IP', 'OR'])]: {
         num: 9,
         level: 'Fusión Doble · 2 Conceptos',
         conceptsText: 'Identidad propia + Orígenes',
         title: 'Creación',
-        description: 'Cómo la agencia individual de quien crea dialoga con el recorrido histórico del término officium, pasando de ser un artesano anónimo en una estructura gremial o burocrática a un autor con nombre propio.'
+        description: 'Antiguamente, los oficios estaban relacionados con el trabajo y el papel que cada persona cumplía dentro de la sociedad. Con el tiempo, quienes realizaban estos trabajos comenzaron a darle un sello más personal a sus creaciones, mostrando su estilo, ideas y forma de ver el mundo. Así, el trabajador pasó de simplemente cumplir una tarea a convertirse en un creador capaz de expresar su identidad y darle un valor propio a lo que hace.'
       },
       [makeKey(['TG', 'OR'])]: {
         num: 10,
         level: 'Fusión Doble · 2 Conceptos',
         conceptsText: 'Traspaso generacional + Orígenes',
         title: 'Memoria Viva',
-        description: 'La historia institucional y comunitaria de los oficios; cómo las estructuras gremiales, familiares y sociales han sostenido la continuidad cultural de una labor a través de los siglos.'
+        description: 'Los oficios surgieron para responder a las necesidades de las personas y ayudar al funcionamiento de la comunidad. Con el tiempo, muchos se organizaron en familias y grupos de trabajadores, donde los conocimientos y experiencias se compartían entre generaciones. Esta transmisión permite mantener vivas las tradiciones y seguir aportando a la sociedad, tanto a través de trabajos remunerados como de labores voluntarias, como la de los bomberos, que contribuyen al bienestar de todos.'
       },
 
       // --- NIVEL 2: FUSIONES TRIPLES (10) ---
@@ -366,70 +365,70 @@
         level: 'Fusión Triple · 3 Conceptos',
         conceptsText: 'Técnica manual + Memoria corporal + Identidad propia',
         title: 'Apropiación Identitaria',
-        description: 'Alguien que domina la transformación del material, tiene la destreza incorporada en sus sentidos y utiliza ambos para reflejar su visión personal en lo que produce.'
+        description: 'Representa a una persona que conoce bien los materiales, domina las herramientas y ha desarrollado habilidades a través de la práctica. Sus movimientos se vuelven naturales con el tiempo y, gracias a su experiencia, puede tomar decisiones propias y darle un estilo personal a cada creación. Así, logra unir lo que piensa, lo que hace con sus manos y su forma de expresarse, creando objetos únicos que reflejan su identidad y dedicación.'
       },
       [makeKey(['TM', 'MC', 'TG'])]: {
         num: 12,
         level: 'Fusión Triple · 3 Conceptos',
         conceptsText: 'Técnica manual + Memoria corporal + Traspaso generacional',
         title: 'Taller Tradicional',
-        description: 'El espacio físico y pedagógico donde se enseña a trabajar los materiales mediante la observación, la repetición y la guía directa de maestros a aprendices.'
+        description: 'Es un espacio donde los oficios se aprenden principalmente a través de la práctica y la experiencia. En él, maestros y aprendices comparten conocimientos, enseñando a trabajar los materiales, utilizar las herramientas y realizar cada movimiento correctamente. A través de la observación, la repetición y los consejos, los aprendices van desarrollando sus habilidades y adquiriendo experiencia. Así, los conocimientos se transmiten de una generación a otra, manteniendo vivas las técnicas y tradiciones del oficio.'
       },
       [makeKey(['TM', 'MC', 'OR'])]: {
         num: 13,
         level: 'Fusión Triple · 3 Conceptos',
         conceptsText: 'Técnica manual + Memoria corporal + Orígenes',
         title: 'Historia de la Tecnología Artesanal',
-        description: 'El recorrido histórico y etimológico de los métodos para trabajar materiales y de las destrezas físicas requeridas para ejecutarlos en distintas épocas.'
+        description: 'A lo largo de la historia, las personas han ido creando nuevas herramientas y formas de trabajar los materiales. Desde los primeros trabajos hechos a mano hasta la llegada de las fábricas y las máquinas, los oficios han tenido que adaptarse a los cambios. Con cada nueva herramienta, las personas también han aprendido nuevas formas de trabajar, utilizando sus manos, sentidos y habilidades. Así, los oficios han evolucionado con el tiempo, manteniendo la importancia de la experiencia y el trabajo manual.'
       },
       [makeKey(['TM', 'IP', 'TG'])]: {
         num: 14,
         level: 'Fusión Triple · 3 Conceptos',
         conceptsText: 'Técnica manual + Identidad propia + Traspaso generacional',
         title: 'Creatividad Artesanal',
-        description: 'Tomar las habilidades y técnicas heredadas de la comunidad y reinterpretarlas desde las decisiones e identidad propia para que el oficio evolucione.'
+        description: 'La tradición y la innovación pueden ir de la mano. Las personas aprenden técnicas y conocimientos que vienen de generaciones anteriores, pero también les incorporan sus propias ideas y estilos. De esta manera, los oficios no se quedan en el pasado, sino que se van renovando y adaptando a los nuevos tiempos y necesidades. Así, cada generación mantiene viva la tradición, aportando algo nuevo y dejando su propia huella.'
       },
       [makeKey(['TM', 'IP', 'OR'])]: {
         num: 15,
         level: 'Fusión Triple · 3 Conceptos',
         conceptsText: 'Técnica manual + Identidad propia + Orígenes',
         title: 'Autoría Histórica',
-        description: 'Cómo la relación entre el individuo, su habilidad con los materiales y el concepto histórico de officium ha definido lo que cada época considera arte, artesanía o labor burocrática.'
+        description: 'A lo largo de la historia, el trabajo manual muchas veces ha sido visto como algo separado del diseño y el arte. Sin embargo, quienes trabajan con sus manos también tienen ideas, creatividad y un estilo propio. A través de sus conocimientos y habilidades, pueden tomar decisiones y darle identidad a sus creaciones. Así, los oficios demuestran que no solo se trata de fabricar objetos, sino también de crear piezas que reflejan la experiencia, la creatividad y la historia de quien las realiza.'
       },
       [makeKey(['TM', 'TG', 'OR'])]: {
         num: 16,
         level: 'Fusión Triple · 3 Conceptos',
         conceptsText: 'Técnica manual + Traspaso generacional + Orígenes',
         title: 'Tradición práctica',
-        description: 'El conjunto de reglas, secretos de fabricación y métodos de enseñanza que los gremios históricos estructuraron para proteger y perpetuar el trabajo con los materiales.'
+        description: 'Durante la Edad Media, los oficios se organizaban en grupos llamados gremios, donde las personas aprendían y perfeccionaban su trabajo. Los conocimientos se transmitían desde los maestros a los aprendices, enseñándoles a utilizar las herramientas, trabajar los materiales y mantener la calidad de sus creaciones. De esta manera, cada oficio conservaba sus técnicas y tradiciones, asegurando que estos conocimientos pasaran de una generación a otra.'
       },
       [makeKey(['MC', 'IP', 'TG'])]: {
         num: 17,
         level: 'Fusión Triple · 3 Conceptos',
         conceptsText: 'Memoria corporal + Identidad propia + Traspaso generacional',
         title: 'Enseñanza singular',
-        description: 'El proceso íntimo de transmisión donde el maestro no solo enseña un gesto físico, sino que permite que el aprendiz adapte esa destreza a su propio cuerpo y experiencia personal.'
+        description: 'Aprender un oficio no significa hacer las cosas exactamente igual que quien las enseña. El maestro comparte sus conocimientos, movimientos y formas de trabajar, pero cada aprendiz los adapta a su manera de ser y a su propia experiencia. Así, aunque las técnicas se transmiten de generación en generación, cada persona desarrolla su propio estilo, manteniendo la tradición y aportando algo único.'
       },
       [makeKey(['MC', 'IP', 'OR'])]: {
         num: 18,
         level: 'Fusión Triple · 3 Conceptos',
         conceptsText: 'Memoria corporal + Identidad propia + Orígenes',
         title: 'Cultura del Gesto',
-        description: 'El análisis histórico y social de cómo el cuerpo humano expresa su individualidad y agencia a través de los sentidos y el movimiento manual a lo largo del tiempo.'
+        description: 'A lo largo de la historia, las personas han utilizado sus manos y habilidades para transformar su entorno y expresar quiénes son. Esto se puede ver tanto en los talleres como en las reparaciones del hogar o en los trabajos hechos por cuenta propia. A través de estas actividades, cada persona desarrolla su propia forma de hacer las cosas, dejando su sello personal en los objetos. Así, el trabajo manual permite crear una conexión más cercana con lo que nos rodea, dándoles un valor propio a las cosas más allá de simplemente comprarlas y consumirlas.'
       },
       [makeKey(['MC', 'TG', 'OR'])]: {
         num: 19,
         level: 'Fusión Triple · 3 Conceptos',
         conceptsText: 'Memoria corporal + Traspaso generacional + Orígenes',
         title: 'Cultura corporal del Oficio',
-        description: 'La memoria colectiva alojada en los cuerpos y gestos de una comunidad de trabajadores, transmitida por imitación y experiencia directa desde los oficios antiguos.'
+        description: 'Los oficios guardan conocimientos que no siempre se aprenden en libros, sino a través de la práctica y la experiencia. Durante generaciones, las personas han transmitido sus habilidades observando e imitando los movimientos de quienes saben más. Así, el cuerpo va aprendiendo distintas formas de trabajar y conserva conocimientos que forman parte de la historia de cada comunidad. De esta manera, los oficios siguen vivos gracias a las personas que los practican y enseñan a las nuevas generaciones.'
       },
       [makeKey(['IP', 'TG', 'OR'])]: {
         num: 20,
         level: 'Fusión Triple · 3 Conceptos',
         conceptsText: 'Identidad propia + Traspaso generacional + Orígenes',
         title: 'Identidad Colectiva e Histórica',
-        description: 'El sentido de pertenencia a un linaje; entender quién eres y qué creas hoy a partir del recorrido histórico del officium y de la comunidad que te transmitió el saber.'
+        description: 'Cada oficio tiene una historia que se construye a través de las personas que lo han practicado y transmitido a lo largo del tiempo. Al aprender un trabajo, no solo se adquieren técnicas y habilidades, sino que también se reciben conocimientos y tradiciones de generaciones anteriores. Esto permite que cada persona se sienta parte de una comunidad y de una historia compartida, aportando su propio estilo y manteniendo viva la identidad del oficio.'
       },
 
       // --- NIVEL 3: FUSIONES CUÁDRUPLES (5) ---
@@ -438,35 +437,35 @@
         level: 'Fusión Cuádruple · 4 Conceptos',
         conceptsText: 'Técnica manual + Memoria corporal + Identidad propia + Traspaso generacional',
         title: 'Oficio Contemporáneo Vivo',
-        description: 'Falta: Orígenes. Es la práctica actual en plena ebullición: dominio del material, destreza física, agencia personal y transmisión entre maestros y aprendices funcionando hoy, sin detenerse en la etimología o el pasado histórico.'
+        description: 'Representa los oficios que se mantienen activos en la actualidad, donde las personas aprenden trabajando directamente con los materiales y desarrollan sus habilidades a través de la práctica. Cada trabajador incorpora su propio estilo y forma de hacer las cosas, mientras comparte sus conocimientos con nuevas generaciones. Así, los oficios siguen evolucionando, combinando la experiencia, la creatividad y la enseñanza en talleres y espacios de aprendizaje actuales.'
       },
       [makeKey(['TM', 'MC', 'IP', 'OR'])]: {
         num: 22,
         level: 'Fusión Cuádruple · 4 Conceptos',
         conceptsText: 'Técnica manual + Memoria corporal + Identidad propia + Orígenes',
         title: 'Autodidacta Histórico',
-        description: 'Falta: Traspaso generacional. La relación profunda entre la persona, su cuerpo, la transformación del material y el peso histórico del officium, pero sin el vínculo comunitario de enseñanza o herencia directa.'
+        description: 'Representa a las personas que aprenden a crear y trabajar con sus propias manos, sin necesidad de seguir las enseñanzas de un maestro o una tradición familiar. A través de la práctica, la experimentación y la búsqueda de conocimientos, desarrollan sus propias habilidades y formas de trabajar. Así, cada persona puede transformar materiales, crear objetos y expresar su identidad, conectándose con la historia de los oficios a través de su propio aprendizaje y experiencia.'
       },
       [makeKey(['TM', 'MC', 'TG', 'OR'])]: {
         num: 23,
         level: 'Fusión Cuádruple · 4 Conceptos',
         conceptsText: 'Técnica manual + Memoria corporal + Traspaso generacional + Orígenes',
         title: 'Entidad tradicional',
-        description: 'Falta: Identidad propia. La maquinaria perfecta de conservación histórica, técnica, corporal y generacional donde lo que importa es preservar el canon del oficio por encima de las decisiones o el sello individual.'
+        description: 'Representa una forma tradicional de organizar y enseñar los oficios, donde lo más importante es conservar los conocimientos y técnicas a través del tiempo. Los maestros enseñan a los aprendices cómo trabajar los materiales, utilizar las herramientas y realizar cada tarea correctamente. De esta manera, los gremios y las instituciones ayudan a mantener las técnicas y tradiciones de cada oficio, asegurando que los conocimientos se transmitan de generación en generación.'
       },
       [makeKey(['TM', 'IP', 'TG', 'OR'])]: {
         num: 24,
         level: 'Fusión Cuádruple · 4 Conceptos',
         conceptsText: 'Técnica manual + Identidad propia + Traspaso generacional + Orígenes',
         title: 'Diseño del Oficio',
-        description: 'Falta: Memoria corporal. Todo el bagaje teórico, histórico, técnico, identitario y cultural de un oficio, visto desde el conocimiento y la historia, pero abstraído de la destreza física y sensorial directa.'
+        description: 'Representa el lado más teórico y creativo de los oficios, donde se estudia su historia, sus técnicas y su importancia cultural. También considera cómo se diseñan y planifican los objetos, tomando en cuenta las ideas y conocimientos de quienes los crean. En este caso, el enfoque está en comprender y transmitir el valor de cada oficio, sin centrarse en el trabajo físico ni en la experiencia directa con los materiales.'
       },
       [makeKey(['MC', 'IP', 'TG', 'OR'])]: {
         num: 25,
         level: 'Fusión Cuádruple · 4 Conceptos',
         conceptsText: 'Memoria corporal + Identidad propia + Traspaso generacional + Orígenes',
         title: 'La Cultura del Trabajo',
-        description: 'Falta: Técnica manual. La dimensión puramente humana, sensorial, identitaria, generacional e histórica de trabajar, independientemente de qué material específico se esté transformando.'
+        description: 'Representa el lado humano y social de los trabajos y servicios que las personas realizan para la comunidad. A través del tiempo, estas labores han construido tradiciones, valores y formas de colaboración que pasan de una generación a otra. No se trata solamente de crear o trabajar con materiales, sino también de ayudar, enseñar y aportar a la sociedad. Esto se puede ver en actividades como el voluntariado de los bomberos, las ceremonias y los servicios públicos, donde el compromiso y la experiencia de las personas cumplen un papel importante en la comunidad.'
       },
 
       // --- NIVEL 4: LA CÉLULA SUPREMA (1) ---
@@ -475,7 +474,7 @@
         level: 'Célula Suprema · 5 Conceptos Integrados',
         conceptsText: 'Técnica manual + Memoria corporal + Identidad propia + Traspaso generacional + Orígenes',
         title: 'La Filosofía Integral del Oficio',
-        description: 'Es el punto de máxima absorción. Define el oficio no como una simple ocupación, sino como una condición humana total: un diálogo vivo donde el cuerpo (Memoria corporal) transforma la materia (Técnica manual) reflejando una voz única (Identidad propia), honrando una continuidad cultural (Traspaso generacional) que hunde sus raíces en la historia y la función social del officium (Orígenes).'
+        description: 'El oficio reúne la historia, los conocimientos y las experiencias de las personas que trabajan con sus manos. A través de la práctica, se aprende a conocer los materiales, utilizar las herramientas y desarrollar habilidades que con el tiempo se vuelven naturales. Cada persona aporta su propio estilo y forma de crear, mientras aprende de quienes estuvieron antes y transmite sus conocimientos a las nuevas generaciones. Así, los oficios mantienen vivas sus tradiciones, pero también evolucionan con el tiempo, uniendo la experiencia, la creatividad y la historia de quienes los practican.'
       }
     };
 
