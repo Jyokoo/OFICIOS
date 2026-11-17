@@ -69,6 +69,10 @@
 </head>
 <body class="bg-white text-black antialiased">
 
+  <!-- ELEMENTOS DE AUDIO NATIVOS -->
+  <audio id="bgmPlayer" loop preload="auto"></audio>
+  <audio id="popPlayer" preload="auto"></audio>
+
   <!-- LIENZO INTERACTIVO TIPO AGAR.IO / TELAR -->
   <canvas id="loomCanvas" class="fixed inset-0 w-full h-full block cursor-grab active:cursor-grabbing"></canvas>
 
@@ -78,7 +82,7 @@
       <div class="w-2.5 h-2.5 rounded-full bg-black animate-pulse"></div>
       <div>
         <h1 class="text-xs sm:text-sm font-bold tracking-wider uppercase leading-none">Telar de los Oficios</h1>
-        <p class="text-[10px] sm:text-xs font-mono-tech text-neutral-600 mt-0.5">Arrastra y une los nodos para descubrir</p>
+        <p class="text-[10px] sm:text-xs font-mono-tech text-neutral-600 mt-0.5">Arrastra y suelta un nodo sobre otro para descubrir</p>
       </div>
     </div>
 
@@ -87,11 +91,6 @@
         class="btn-brutal bg-white hover:bg-black hover:text-white border border-black px-3 py-2 text-xs font-mono-tech flex items-center gap-2 cursor-pointer">
         <span>MEZCLAS:</span>
         <strong id="counterText">0 / 26</strong>
-      </button>
-
-      <button id="btnReset" title="Separar los nodos nuevamente"
-        class="btn-brutal bg-white hover:bg-black hover:text-white border border-black px-3 py-2 text-xs font-mono-tech uppercase cursor-pointer">
-        Reiniciar
       </button>
 
       <button id="btnAbout" title="Concepto curatorial"
@@ -104,7 +103,7 @@
   <!-- INDICADOR INFERIOR DE INSTRUCCIÓN TÁCTIL -->
   <footer class="fixed bottom-3 left-0 right-0 z-10 pointer-events-none flex justify-center px-4">
     <div id="hintPill" class="bg-white/95 border border-black px-3.5 py-1.5 text-[11px] sm:text-xs font-mono-tech text-black text-center">
-      Toca un nodo para leer su raíz · Arrastra un nodo sobre otro para fusionarlos
+      Arrastra y suelta un nodo sobre otro para fusionarlos · Arrastra un icono interno para separarlos
     </div>
   </footer>
 
@@ -163,7 +162,6 @@
          class="modal-card relative w-full max-w-xl bg-white border-2 border-black p-6 sm:p-8 text-black cursor-default max-h-[88vh] overflow-y-auto">
       <div class="flex items-center justify-between border-b-2 border-black pb-3 mb-4">
         <span class="text-xs font-mono-tech uppercase tracking-widest font-bold">Telar Contemporáneo · Patrimonio Vivo</span>
-       
       </div>
 
       <h2 class="text-xl sm:text-2xl font-bold tracking-tight mb-4">
@@ -174,7 +172,6 @@
         <p>
           Esta interacción busca transformar el patrimonio cultural en una experiencia tangible, metaforizando de manera intuitiva cómo los oficios evolucionan y se preservan al entrelazarse a través de las generaciones.
         </p>
-       
       </div>
 
       <div class="mt-6 pt-4 border-t border-black flex flex-col sm:flex-row items-center justify-between gap-3">
@@ -209,6 +206,140 @@
   </div>
 
   <script>
+    /**
+     * =========================================================================
+     * 0. MOTOR HÍBRIDO DE AUDIO
+     *    - Música de fondo: "Club Penguin - Pizza Parlor Theme [Loop High Quality].mp3" (50% vol, bucle)
+     *    - Separación: "Pop (Minecraft Sound) - Sound Effect for editing.mp3"
+     *    - Unión: Campanilla cristalina sintetizada (Web Audio API)
+     * =========================================================================
+     */
+    const AudioEngine = (() => {
+      let ctx = null;
+
+      const BGM_FILE = 'Club Penguin - Pizza Parlor Theme [Loop High Quality].mp3';
+      const POP_FILE = 'Pop (Minecraft Sound) - Sound Effect for editing.mp3';
+
+      const bgmAudio = document.getElementById('bgmPlayer');
+      bgmAudio.src = encodeURI(BGM_FILE);
+      bgmAudio.loop = true;
+      bgmAudio.volume = 0.5;
+
+      const separateAudio = document.getElementById('popPlayer');
+      separateAudio.src = encodeURI(POP_FILE);
+
+      let audioUnlocked = false;
+
+      function getContext() {
+        if (!ctx) {
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (AudioCtx) ctx = new AudioCtx();
+        }
+        if (ctx && ctx.state === 'suspended') {
+          ctx.resume().catch(() => {});
+        }
+        return ctx;
+      }
+
+      function startBgm() {
+        bgmAudio.volume = 0.5;
+        bgmAudio.loop = true;
+        if (bgmAudio.paused) {
+          const playPromise = bgmAudio.play();
+          if (playPromise !== undefined) {
+            playPromise.catch(() => {});
+          }
+        }
+      }
+
+      function unlock() {
+        getContext();
+        startBgm();
+
+        if (audioUnlocked) return;
+        audioUnlocked = true;
+
+        const prevVol = separateAudio.volume;
+        separateAudio.volume = 0;
+        const p = separateAudio.play();
+        if (p !== undefined) {
+          p.then(() => {
+            separateAudio.pause();
+            separateAudio.currentTime = 0;
+            separateAudio.volume = prevVol;
+          }).catch(() => {
+            separateAudio.volume = prevVol;
+          });
+        }
+      }
+
+      ['click', 'pointerdown', 'touchstart', 'keydown'].forEach(evt => {
+        window.addEventListener(evt, unlock, { passive: true });
+      });
+
+      function playSeparateSound() {
+        try {
+          const clone = separateAudio.cloneNode();
+          clone.play().catch(() => {
+            separateAudio.currentTime = 0;
+            separateAudio.play().catch(() => {});
+          });
+        } catch (e) {
+          separateAudio.currentTime = 0;
+          separateAudio.play().catch(() => {});
+        }
+      }
+
+      function playMergeSound() {
+        const audioCtx = getContext();
+        if (!audioCtx) return;
+
+        const now = audioCtx.currentTime;
+        const notes = [783.99, 987.77, 1174.66, 1567.98];
+
+        notes.forEach((freq, idx) => {
+          const startTime = now + idx * 0.065;
+          const duration = 0.65;
+
+          const osc = audioCtx.createOscillator();
+          const harmonic = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          const harmGain = audioCtx.createGain();
+
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, startTime);
+
+          harmonic.type = 'triangle';
+          harmonic.frequency.setValueAtTime(freq * 2, startTime);
+
+          gain.gain.setValueAtTime(0.001, startTime);
+          gain.gain.linearRampToValueAtTime(0.16, startTime + 0.012);
+          gain.gain.exponentialRampToValueAtTime(0.0008, startTime + duration);
+
+          harmGain.gain.setValueAtTime(0.001, startTime);
+          harmGain.gain.linearRampToValueAtTime(0.045, startTime + 0.01);
+          harmGain.gain.exponentialRampToValueAtTime(0.0005, startTime + duration * 0.6);
+
+          osc.connect(gain);
+          harmonic.connect(harmGain);
+          harmGain.connect(gain);
+          gain.connect(audioCtx.destination);
+
+          osc.start(startTime);
+          harmonic.start(startTime);
+          osc.stop(startTime + duration + 0.02);
+          harmonic.stop(startTime + duration + 0.02);
+        });
+      }
+
+      return {
+        unlock,
+        startBgm,
+        playSeparate: playSeparateSound,
+        playMerge: playMergeSound
+      };
+    })();
+
     /**
      * =========================================================================
      * 1. BASE DE DATOS CONCEPTUAL: 5 NODOS BASE + 26 COMBINACIONES EXACTAS
@@ -480,7 +611,7 @@
 
     /**
      * =========================================================================
-     * 2. MOTOR DE FÍSICA Y RENDERIZADO EN CANVAS (AGAR.IO + ICONOS + EFECTOS)
+     * 2. MOTOR DE FÍSICA Y RENDERIZADO EN CANVAS (MOVIMIENTO INDEPENDIENTE)
      * =========================================================================
      */
     const canvas = document.getElementById('loomCanvas');
@@ -499,13 +630,23 @@
     let discoveredKeys = new Set();
 
     let draggedCell = null;
+    let mergeTargetCell = null;
     let hoveredCell = null;
+    let hoveredIconInfo = null;
     let dragOffsetX = 0;
     let dragOffsetY = 0;
     let pointerDownPos = { x: 0, y: 0 };
     let pointerDownTime = 0;
     let isPaused = false;
     let time = 0;
+
+    // Temporizador de inactividad de 1 minuto y medio (90 000 ms)
+    const INACTIVITY_TIMEOUT_MS = 90000;
+    let lastActivityTime = performance.now();
+
+    function registerActivity() {
+      lastActivityTime = performance.now();
+    }
 
     const modalOverlay = document.getElementById('modalOverlay');
     const modalBox = document.getElementById('modalBox');
@@ -546,6 +687,21 @@
       return base * (1 + (count - 1) * 0.28);
     }
 
+    // Genera parámetros de movimiento autónomos y distintos para cada nodo
+    function createIndependentMotion(customAngle = null, customSpeed = null) {
+      const heading = customAngle !== null ? customAngle : Math.random() * Math.PI * 2;
+      const baseSpeed = customSpeed !== null ? customSpeed : (0.35 + Math.random() * 0.65);
+      return {
+        heading,
+        baseSpeed,
+        turnRate: (Math.random() - 0.5) * 0.016,
+        freqX: 0.45 + Math.random() * 0.95,
+        freqY: 0.45 + Math.random() * 0.95,
+        phaseX: Math.random() * Math.PI * 2,
+        phaseY: Math.random() * Math.PI * 2
+      };
+    }
+
     function initParticles() {
       particles = [];
       const count = Math.floor((width * height) / 26000);
@@ -576,18 +732,25 @@
         const y = centerY + Math.sin(angle) * spreadY;
         const radius = getRadiusForCount(1);
 
+        // Cada nodo parte con una dirección y velocidad única
+        const uniqueHeading = angle + Math.PI * 0.65 + idx * 1.15;
+        const uniqueSpeed = 0.38 + ((idx * 37) % 10) * 0.065;
+        const motion = createIndependentMotion(uniqueHeading, uniqueSpeed);
+
         cells.push({
           concepts: [concept],
           x,
           y,
-          vx: (Math.random() - 0.5) * 0.7,
-          vy: (Math.random() - 0.5) * 0.7,
+          vx: Math.cos(motion.heading) * motion.baseSpeed,
+          vy: Math.sin(motion.heading) * motion.baseSpeed,
+          ...motion,
           radius,
           targetRadius: radius,
           seed: Math.random() * 100,
           pulse: 0,
           glow: 0,
-          depth: 0.85 + (idx % 3) * 0.12
+          depth: 0.85 + (idx % 3) * 0.12,
+          mergeCooldownUntil: 0
         });
       });
     }
@@ -627,29 +790,37 @@
       modalOverlay.classList.add('hidden');
       modalOverlay.classList.remove('flex');
       isPaused = false;
+      registerActivity();
     }
 
     modalOverlay.addEventListener('click', (e) => {
+      AudioEngine.unlock();
       if (e.target === modalOverlay) closeCombinationModal();
     });
     modalBox.addEventListener('click', (e) => e.stopPropagation());
 
     aboutOverlay.addEventListener('click', (e) => {
+      AudioEngine.unlock();
       if (e.target === aboutOverlay) {
         aboutOverlay.classList.add('hidden');
         aboutOverlay.classList.remove('flex');
         isPaused = false;
+        registerActivity();
       }
     });
     aboutBox.addEventListener('click', (e) => e.stopPropagation());
 
     document.getElementById('btnStart').addEventListener('click', () => {
+      AudioEngine.unlock();
       aboutOverlay.classList.add('hidden');
       aboutOverlay.classList.remove('flex');
       isPaused = false;
+      registerActivity();
     });
 
     document.getElementById('btnAbout').addEventListener('click', () => {
+      AudioEngine.unlock();
+      registerActivity();
       isPaused = true;
       aboutOverlay.classList.remove('hidden');
       aboutOverlay.classList.add('flex');
@@ -661,7 +832,7 @@
         logList.innerHTML = `
           <div class="border border-dashed border-black p-6 text-center font-mono-tech text-xs text-neutral-600">
             Aún no has entrelazado ningún concepto.<br/>
-            Arrastra un nodo sobre otro en el telar para descubrir su significado.
+            Arrastra y suelta un nodo sobre otro en el telar para descubrir su significado.
           </div>
         `;
         return;
@@ -689,6 +860,8 @@
     }
 
     document.getElementById('btnBitacora').addEventListener('click', () => {
+      AudioEngine.unlock();
+      registerActivity();
       isPaused = true;
       renderBitacora();
       logOverlay.classList.remove('hidden');
@@ -696,28 +869,18 @@
     });
 
     logOverlay.addEventListener('click', (e) => {
+      AudioEngine.unlock();
       if (e.target === logOverlay) {
         logOverlay.classList.add('hidden');
         logOverlay.classList.remove('flex');
         isPaused = false;
+        registerActivity();
       }
     });
     logBox.addEventListener('click', (e) => e.stopPropagation());
 
-    document.getElementById('btnReset').addEventListener('click', () => {
-      draggedCell = null;
-      hoveredCell = null;
-      initCells();
-      shockwaves.push({
-        x: width / 2,
-        y: height / 2,
-        r: 14,
-        maxR: Math.max(width, height) * 0.45,
-        alpha: 0.45
-      });
-    });
-
     window.addEventListener('keydown', (e) => {
+      registerActivity();
       if (e.key === 'Escape') {
         if (!modalOverlay.classList.contains('hidden')) closeCombinationModal();
         if (!aboutOverlay.classList.contains('hidden')) {
@@ -735,10 +898,35 @@
 
     /**
      * =========================================================================
-     * 4. LÓGICA DE FUSIÓN DE CÉLULAS + EFECTOS ESPECIALES (ONDAS Y CHISPAS)
+     * 4. LÓGICA DE FUSIÓN, EXTRACCIÓN DE ICONOS Y SEPARACIÓN AUTOMÁTICA
      * =========================================================================
      */
+    function findMergeCandidate(sourceCell) {
+      if (!sourceCell) return null;
+      const now = performance.now();
+      if (now < (sourceCell.mergeCooldownUntil || 0)) return null;
+
+      let closest = null;
+      let closestDist = Infinity;
+
+      for (let i = 0; i < cells.length; i++) {
+        const other = cells[i];
+        if (other === sourceCell) continue;
+        if (now < (other.mergeCooldownUntil || 0)) continue;
+
+        const dist = Math.hypot(sourceCell.x - other.x, sourceCell.y - other.y);
+        const mergeThreshold = (sourceCell.radius + other.radius) * 0.72;
+        if (dist < mergeThreshold && dist < closestDist) {
+          closest = other;
+          closestDist = dist;
+        }
+      }
+      return closest;
+    }
+
     function fuseCells(cellA, cellB) {
+      AudioEngine.playMerge();
+
       const combinedConcepts = [...cellA.concepts];
       cellB.concepts.forEach(c => {
         if (!combinedConcepts.some(existing => existing.id === c.id)) {
@@ -759,24 +947,29 @@
       const newX = (cellA.x * cellA.concepts.length + cellB.x * cellB.concepts.length) / totalCount;
       const newY = (cellA.y * cellA.concepts.length + cellB.y * cellB.concepts.length) / totalCount;
       const newRadius = getRadiusForCount(totalCount);
+      const motion = createIndependentMotion(Math.random() * Math.PI * 2, 0.3 + Math.random() * 0.45);
 
       const mergedCell = {
         concepts: combinedConcepts,
         x: newX,
         y: newY,
-        vx: (cellA.vx + cellB.vx) * 0.3,
-        vy: (cellA.vy + cellB.vy) * 0.3,
+        vx: Math.cos(motion.heading) * motion.baseSpeed,
+        vy: Math.sin(motion.heading) * motion.baseSpeed,
+        ...motion,
         radius: Math.max(cellA.radius, cellB.radius),
         targetRadius: newRadius,
         seed: cellA.seed,
         pulse: 1.3,
         glow: 1.4,
-        depth: cellA.depth
+        depth: cellA.depth,
+        mergeCooldownUntil: 0
       };
 
       cells = cells.filter(c => c !== cellA && c !== cellB);
       cells.push(mergedCell);
       draggedCell = null;
+      mergeTargetCell = null;
+      hoveredIconInfo = null;
 
       shockwaves.push({
         x: newX,
@@ -811,9 +1004,120 @@
       }
     }
 
+    function detachConceptFromCell(parentCell, conceptIndex, iconWorldX, iconWorldY) {
+      const extractedConcept = parentCell.concepts[conceptIndex];
+      const remainingConcepts = parentCell.concepts.filter((_, idx) => idx !== conceptIndex);
+
+      if (remainingConcepts.length === 0) return parentCell;
+
+      AudioEngine.playSeparate();
+
+      const now = performance.now();
+      const cooldown = now + 450;
+
+      parentCell.concepts = remainingConcepts;
+      parentCell.targetRadius = getRadiusForCount(remainingConcepts.length);
+      parentCell.pulse = 0.85;
+      parentCell.mergeCooldownUntil = cooldown;
+
+      const dx = iconWorldX - parentCell.x;
+      const dy = iconWorldY - parentCell.y;
+      const dist = Math.hypot(dx, dy) || 1;
+      const awayAngle = Math.atan2(-dy, -dx);
+      parentCell.heading = awayAngle;
+      parentCell.vx = Math.cos(awayAngle) * 2.2;
+      parentCell.vy = Math.sin(awayAngle) * 2.2;
+
+      const singleRadius = getRadiusForCount(1);
+      const motion = createIndependentMotion(Math.atan2(dy, dx), 0.4 + Math.random() * 0.55);
+      const extractedCell = {
+        concepts: [extractedConcept],
+        x: iconWorldX,
+        y: iconWorldY,
+        vx: (dx / dist) * 1.5,
+        vy: (dy / dist) * 1.5,
+        ...motion,
+        radius: singleRadius * 0.65,
+        targetRadius: singleRadius,
+        seed: Math.random() * 100,
+        pulse: 0.9,
+        glow: 1,
+        depth: parentCell.depth,
+        mergeCooldownUntil: cooldown
+      };
+
+      cells.push(extractedCell);
+
+      shockwaves.push({
+        x: iconWorldX,
+        y: iconWorldY,
+        r: singleRadius * 0.25,
+        maxR: singleRadius * 1.4,
+        alpha: 0.55
+      });
+
+      return extractedCell;
+    }
+
+    function separateAllMergedCells() {
+      const hasMerged = cells.some(c => c.concepts.length > 1);
+      if (!hasMerged) return;
+
+      AudioEngine.playSeparate();
+
+      const nextCells = [];
+      const singleRadius = getRadiusForCount(1);
+      const cooldown = performance.now() + 900;
+
+      cells.forEach(c => {
+        if (c.concepts.length === 1) {
+          nextCells.push(c);
+        } else {
+          const count = c.concepts.length;
+          c.concepts.forEach((concept, idx) => {
+            const angle = -Math.PI / 2 + (idx * Math.PI * 2) / count + Math.random() * 0.5;
+            const offsetDist = Math.max(c.radius * 0.55, singleRadius * 0.95);
+            const nx = Math.max(singleRadius + 16, Math.min(width - singleRadius - 16, c.x + Math.cos(angle) * offsetDist));
+            const ny = Math.max(singleRadius + 74, Math.min(height - singleRadius - 42, c.y + Math.sin(angle) * offsetDist));
+            const motion = createIndependentMotion(angle, 0.35 + Math.random() * 0.65);
+
+            nextCells.push({
+              concepts: [concept],
+              x: nx,
+              y: ny,
+              vx: Math.cos(angle) * 3.0,
+              vy: Math.sin(angle) * 3.0,
+              ...motion,
+              radius: singleRadius * 0.85,
+              targetRadius: singleRadius,
+              seed: Math.random() * 100,
+              pulse: 0.95,
+              glow: 0,
+              depth: 0.85 + (idx % 3) * 0.12,
+              mergeCooldownUntil: cooldown
+            });
+          });
+
+          shockwaves.push({
+            x: c.x,
+            y: c.y,
+            r: c.radius * 0.4,
+            maxR: c.radius * 2.1,
+            alpha: 0.65
+          });
+        }
+      });
+
+      cells = nextCells;
+      draggedCell = null;
+      mergeTargetCell = null;
+      hoveredCell = null;
+      hoveredIconInfo = null;
+    }
+
     /**
      * =========================================================================
-     * 5. INTERACCIÓN TÁCTIL Y CON MOUSE
+     * 5. INTERACCIÓN TÁCTIL Y CON MOUSE (UNIR SOLO AL SOLTAR EL CLIC)
      * =========================================================================
      */
     function getPointerCoords(e) {
@@ -821,6 +1125,43 @@
         return { x: e.touches[0].clientX, y: e.touches[0].clientY };
       }
       return { x: e.clientX, y: e.clientY };
+    }
+
+    function getOrbitIconPositions(c) {
+      const count = c.concepts.length;
+      const cx = c.x + camera.x * 16 * c.depth;
+      const cy = c.y + camera.y * 16 * c.depth;
+      const orbitR = c.radius * 0.36;
+      const hitR = Math.max(18, c.radius * 0.24);
+
+      return c.concepts.map((concept, idx) => {
+        const ang = -Math.PI / 2 + (idx * Math.PI * 2) / count + time * 0.35;
+        return {
+          cell: c,
+          conceptIndex: idx,
+          concept,
+          screenX: cx + Math.cos(ang) * orbitR,
+          screenY: cy + Math.sin(ang) * orbitR,
+          worldX: c.x + Math.cos(ang) * orbitR,
+          worldY: c.y + Math.sin(ang) * orbitR,
+          hitR
+        };
+      });
+    }
+
+    function findInnerIconAt(x, y) {
+      for (let i = cells.length - 1; i >= 0; i--) {
+        const c = cells[i];
+        if (c.concepts.length <= 1) continue;
+        const icons = getOrbitIconPositions(c);
+        for (let j = 0; j < icons.length; j++) {
+          const icon = icons[j];
+          if (Math.hypot(x - icon.screenX, y - icon.screenY) <= icon.hitR) {
+            return icon;
+          }
+        }
+      }
+      return null;
     }
 
     function findCellAt(x, y) {
@@ -837,11 +1178,35 @@
     }
 
     function handlePointerDown(e) {
+      AudioEngine.unlock();
+      registerActivity();
       if (isPaused) return;
       const pos = getPointerCoords(e);
       pointerDownPos = { x: pos.x, y: pos.y };
       pointerDownTime = performance.now();
+      mergeTargetCell = null;
 
+      // 1. Verificar si tocó un icono interno dentro de un nodo fusionado
+      const innerIcon = findInnerIconAt(pos.x, pos.y);
+      if (innerIcon) {
+        const detached = detachConceptFromCell(
+          innerIcon.cell,
+          innerIcon.conceptIndex,
+          innerIcon.worldX,
+          innerIcon.worldY
+        );
+        draggedCell = detached;
+        hoveredCell = detached;
+        hoveredIconInfo = null;
+
+        const cx = detached.x + camera.x * 16 * detached.depth;
+        const cy = detached.y + camera.y * 16 * detached.depth;
+        dragOffsetX = pos.x - cx;
+        dragOffsetY = pos.y - cy;
+        return;
+      }
+
+      // 2. Si no tocó un icono interno, agarrar el nodo completo
       const hit = findCellAt(pos.x, pos.y);
       if (hit) {
         draggedCell = hit;
@@ -860,6 +1225,7 @@
     }
 
     function handlePointerMove(e) {
+      registerActivity();
       const pos = getPointerCoords(e);
       camera.targetX = (pos.x / width - 0.5) * 2;
       camera.targetY = (pos.y / height - 0.5) * 2;
@@ -867,8 +1233,9 @@
       if (isPaused) return;
 
       if (!draggedCell) {
-        hoveredCell = findCellAt(pos.x, pos.y);
-        canvas.style.cursor = hoveredCell ? 'grab' : 'default';
+        hoveredIconInfo = findInnerIconAt(pos.x, pos.y);
+        hoveredCell = hoveredIconInfo ? hoveredIconInfo.cell : findCellAt(pos.x, pos.y);
+        canvas.style.cursor = (hoveredIconInfo || hoveredCell) ? 'grab' : 'default';
         return;
       }
 
@@ -883,19 +1250,11 @@
       draggedCell.x = Math.max(draggedCell.radius + 10, Math.min(width - draggedCell.radius - 10, targetX));
       draggedCell.y = Math.max(draggedCell.radius + 60, Math.min(height - draggedCell.radius - 20, targetY));
 
-      for (let i = 0; i < cells.length; i++) {
-        const other = cells[i];
-        if (other === draggedCell) continue;
-        const dist = Math.hypot(draggedCell.x - other.x, draggedCell.y - other.y);
-        const mergeThreshold = (draggedCell.radius + other.radius) * 0.62;
-        if (dist < mergeThreshold) {
-          fuseCells(draggedCell, other);
-          break;
-        }
-      }
+      mergeTargetCell = findMergeCandidate(draggedCell);
     }
 
     function handlePointerUp(e) {
+      registerActivity();
       if (!draggedCell) return;
 
       const elapsed = performance.now() - pointerDownTime;
@@ -908,6 +1267,7 @@
       if (elapsed < 260 && movedDist < 10) {
         const clickedCell = draggedCell;
         draggedCell = null;
+        mergeTargetCell = null;
         if (clickedCell.concepts.length === 1) {
           openBaseConceptModal(clickedCell.concepts[0]);
         } else {
@@ -919,7 +1279,23 @@
         return;
       }
 
+      const targetToMerge = findMergeCandidate(draggedCell);
+      if (targetToMerge) {
+        fuseCells(draggedCell, targetToMerge);
+        canvas.style.cursor = 'default';
+        return;
+      }
+
+      // Al soltarlo en el espacio libre, conserva una dirección independiente
+      if (Math.hypot(draggedCell.vx, draggedCell.vy) > 0.2) {
+        draggedCell.heading = Math.atan2(draggedCell.vy, draggedCell.vx);
+      } else {
+        draggedCell.heading = Math.random() * Math.PI * 2;
+      }
+      draggedCell.turnRate = (Math.random() - 0.5) * 0.018;
+
       draggedCell = null;
+      mergeTargetCell = null;
       canvas.style.cursor = hoveredCell ? 'grab' : 'default';
     }
 
@@ -933,15 +1309,34 @@
 
     /**
      * =========================================================================
-     * 6. FÍSICA, ICONOS GEOMÉTRICOS Y EFECTOS ESPECIALES DE FUSIÓN
+     * 6. FÍSICA DE MOVIMIENTO INDEPENDIENTE Y RENDERIZADO
      * =========================================================================
      */
     function updatePhysics() {
       camera.x += (camera.targetX - camera.x) * 0.06;
       camera.y += (camera.targetY - camera.y) * 0.06;
 
+      const now = performance.now();
+
+      if (!draggedCell && (now - lastActivityTime) >= INACTIVITY_TIMEOUT_MS) {
+        lastActivityTime = now;
+        if (!modalOverlay.classList.contains('hidden')) closeCombinationModal();
+        if (!logOverlay.classList.contains('hidden')) {
+          logOverlay.classList.add('hidden');
+          logOverlay.classList.remove('flex');
+          isPaused = false;
+        }
+        separateAllMergedCells();
+      }
+
       if (isPaused) return;
       time += 0.025;
+
+      if (draggedCell) {
+        mergeTargetCell = findMergeCandidate(draggedCell);
+      } else {
+        mergeTargetCell = null;
+      }
 
       for (let i = shockwaves.length - 1; i >= 0; i--) {
         const sw = shockwaves[i];
@@ -965,16 +1360,23 @@
         c.radius += (c.targetRadius - c.radius) * 0.14;
         if (c.pulse > 0) c.pulse = Math.max(0, c.pulse - 0.03);
 
-        const isActive = c === draggedCell || c === hoveredCell;
+        const isActive = c === draggedCell || c === hoveredCell || c === mergeTargetCell;
         const targetGlow = isActive ? 1 : 0;
         c.glow += (targetGlow - c.glow) * 0.15;
 
         if (c !== draggedCell) {
-          c.vx += Math.cos(time * 0.8 + c.seed) * 0.012;
-          c.vy += Math.sin(time * 0.7 + c.seed) * 0.012;
+          // Cada nodo evoluciona su propio rumbo y ritmo individualmente
+          c.heading += c.turnRate + Math.sin(time * c.freqX + c.phaseX) * 0.008;
+          if (Math.random() < 0.008) {
+            c.turnRate = (Math.random() - 0.5) * 0.02;
+          }
 
-          c.vx *= 0.985;
-          c.vy *= 0.985;
+          const desiredVx = Math.cos(c.heading) * c.baseSpeed + Math.cos(time * c.freqX + c.phaseX) * 0.18;
+          const desiredVy = Math.sin(c.heading) * c.baseSpeed + Math.sin(time * c.freqY + c.phaseY) * 0.18;
+
+          // Convergencia suave hacia su propia velocidad independiente
+          c.vx += (desiredVx - c.vx) * 0.035;
+          c.vy += (desiredVy - c.vy) * 0.035;
 
           c.x += c.vx;
           c.y += c.vy;
@@ -983,52 +1385,56 @@
           const padBottom = 42;
           const padSide = 16;
 
+          // Rebote independiente contra los bordes reflejando su ángulo propio
           if (c.x - c.radius < padSide) {
             c.x = padSide + c.radius;
-            c.vx = Math.abs(c.vx) * 0.8;
+            c.vx = Math.abs(c.vx);
+            c.heading = Math.atan2(c.vy, c.vx) + (Math.random() - 0.5) * 0.35;
           } else if (c.x + c.radius > width - padSide) {
             c.x = width - padSide - c.radius;
-            c.vx = -Math.abs(c.vx) * 0.8;
+            c.vx = -Math.abs(c.vx);
+            c.heading = Math.atan2(c.vy, c.vx) + (Math.random() - 0.5) * 0.35;
           }
 
           if (c.y - c.radius < padTop) {
             c.y = padTop + c.radius;
-            c.vy = Math.abs(c.vy) * 0.8;
+            c.vy = Math.abs(c.vy);
+            c.heading = Math.atan2(c.vy, c.vx) + (Math.random() - 0.5) * 0.35;
           } else if (c.y + c.radius > height - padBottom) {
             c.y = height - padBottom - c.radius;
-            c.vy = -Math.abs(c.vy) * 0.8;
+            c.vy = -Math.abs(c.vy);
+            c.heading = Math.atan2(c.vy, c.vx) + (Math.random() - 0.5) * 0.35;
           }
         }
 
+        // Rebote individual cuando dos nodos libres se encuentran (sin sincronizarse)
         for (let j = i + 1; j < cells.length; j++) {
           const other = cells[j];
+          if (c === draggedCell || other === draggedCell) continue;
+
           const dx = other.x - c.x;
           const dy = other.y - c.y;
           const dist = Math.hypot(dx, dy) || 1;
-          const minDist = c.radius + other.radius;
+          const minDist = c.radius + other.radius + 14;
 
-          if ((c === draggedCell || other === draggedCell) && dist < minDist * 1.28) {
-            const pull = 0.048;
-            if (c !== draggedCell) {
-              c.vx += (dx / dist) * pull * 8;
-              c.vy += (dy / dist) * pull * 8;
-            }
-            if (other !== draggedCell) {
-              other.vx -= (dx / dist) * pull * 8;
-              other.vy -= (dy / dist) * pull * 8;
-            }
-          } else if (dist < minDist + 18) {
-            const push = (minDist + 18 - dist) * 0.008;
+          if (dist < minDist) {
             const nx = dx / dist;
             const ny = dy / dist;
-            if (c !== draggedCell) {
-              c.vx -= nx * push;
-              c.vy -= ny * push;
-            }
-            if (other !== draggedCell) {
-              other.vx += nx * push;
-              other.vy += ny * push;
-            }
+            const overlap = (minDist - dist) * 0.5;
+
+            c.x -= nx * overlap;
+            c.y -= ny * overlap;
+            other.x += nx * overlap;
+            other.y += ny * overlap;
+
+            // Desviar cada nodo en direcciones opuestas con ligera variación propia
+            c.vx -= nx * 0.35;
+            c.vy -= ny * 0.35;
+            other.vx += nx * 0.35;
+            other.vy += ny * 0.35;
+
+            c.heading = Math.atan2(c.vy, c.vx) + (Math.random() - 0.5) * 0.25;
+            other.heading = Math.atan2(other.vy, other.vx) + (Math.random() - 0.5) * 0.25;
           }
         }
       }
@@ -1078,73 +1484,6 @@
           ctx.stroke();
         }
       });
-    }
-
-    function drawLoomThreadsAndMetaballs() {
-      for (let i = 0; i < cells.length; i++) {
-        for (let j = i + 1; j < cells.length; j++) {
-          const a = cells[i];
-          const b = cells[j];
-          const ax = a.x + camera.x * 16 * a.depth;
-          const ay = a.y + camera.y * 16 * a.depth;
-          const bx = b.x + camera.x * 16 * b.depth;
-          const by = b.y + camera.y * 16 * b.depth;
-
-          const dx = bx - ax;
-          const dy = by - ay;
-          const dist = Math.hypot(dx, dy);
-          const sumR = a.radius + b.radius;
-          const maxThreadDist = sumR * 2.1;
-
-          if (dist < maxThreadDist) {
-            const proximity = 1 - dist / maxThreadDist;
-            ctx.save();
-            ctx.beginPath();
-            ctx.moveTo(ax, ay);
-            const midX = (ax + bx) / 2;
-            const midY = (ay + by) / 2 + Math.sin(time * 2 + i + j) * (12 * (1 - proximity));
-            ctx.quadraticCurveTo(midX, midY, bx, by);
-
-            ctx.strokeStyle = `rgba(0, 0, 0, ${0.12 + proximity * 0.55})`;
-            ctx.lineWidth = 0.8 + proximity * 1.4;
-            if (proximity < 0.45) ctx.setLineDash([4, 4]);
-            ctx.stroke();
-            ctx.restore();
-          }
-
-          if (dist < sumR * 1.48 && dist > 1) {
-            const prox = Math.max(0, Math.min(1, 1 - (dist - sumR * 0.72) / (sumR * 0.76)));
-            if (prox > 0.04) {
-              const midX = (ax + bx) * 0.5;
-              const midY = (ay + by) * 0.5;
-              const perpX = -dy / dist;
-              const perpY = dx / dist;
-              const neck = Math.min(a.radius, b.radius) * 0.56 * prox;
-
-              ctx.save();
-              ctx.fillStyle = `rgba(0, 0, 0, ${0.16 * prox})`;
-              ctx.beginPath();
-              ctx.moveTo(ax + perpX * a.radius * 0.54, ay + perpY * a.radius * 0.54);
-              ctx.quadraticCurveTo(
-                midX + perpX * neck,
-                midY + perpY * neck,
-                bx + perpX * b.radius * 0.54,
-                by + perpY * b.radius * 0.54
-              );
-              ctx.lineTo(bx - perpX * b.radius * 0.54, by - perpY * b.radius * 0.54);
-              ctx.quadraticCurveTo(
-                midX - perpX * neck,
-                midY - perpY * neck,
-                ax - perpX * a.radius * 0.54,
-                ay - perpY * a.radius * 0.54
-              );
-              ctx.closePath();
-              ctx.fill();
-              ctx.restore();
-            }
-          }
-        }
-      }
     }
 
     function drawConceptGlyph(ctx, glyphKey, r, isInverted) {
@@ -1243,10 +1582,37 @@
       ctx.restore();
     }
 
+    function drawMergePreviewLink() {
+      if (!draggedCell || !mergeTargetCell) return;
+
+      const x1 = draggedCell.x + camera.x * 16 * draggedCell.depth;
+      const y1 = draggedCell.y + camera.y * 16 * draggedCell.depth;
+      const x2 = mergeTargetCell.x + camera.x * 16 * mergeTargetCell.depth;
+      const y2 = mergeTargetCell.y + camera.y * 16 * mergeTargetCell.depth;
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.strokeStyle = 'rgba(0, 0, 0, 0.45)';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([5, 5]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      ctx.beginPath();
+      ctx.arc(x2, y2, mergeTargetCell.radius + 13 + Math.sin(time * 5) * 2.5, 0, Math.PI * 2);
+      ctx.strokeStyle = '#000000';
+      ctx.lineWidth = 1.8;
+      ctx.stroke();
+      ctx.restore();
+    }
+
     function drawCell(c) {
       const count = c.concepts.length;
       const isSupreme = count === 5;
       const isDragged = c === draggedCell;
+      const isMergeCandidate = c === mergeTargetCell;
       const isInverted = isSupreme || c.glow > 0.55;
 
       const cx = c.x + camera.x * 16 * c.depth;
@@ -1264,8 +1630,8 @@
 
       ctx.save();
       ctx.beginPath();
-      ctx.strokeStyle = `rgba(0, 0, 0, ${0.16 + c.glow * 0.45})`;
-      ctx.lineWidth = 1;
+      ctx.strokeStyle = `rgba(0, 0, 0, ${isMergeCandidate ? 0.75 : (0.16 + c.glow * 0.45)})`;
+      ctx.lineWidth = isMergeCandidate ? 1.5 : 1;
       ctx.setLineDash([3, 5]);
       ctx.arc(cx, cy, c.radius + 7 + Math.sin(time * 1.6 + c.seed) * 2, 0, Math.PI * 2);
       ctx.stroke();
@@ -1317,7 +1683,6 @@
         }
       }
 
-      // ICONOS GEOMÉTRICOS CENTRADOS DENTRO DEL CÍRCULO
       if (count === 1) {
         ctx.save();
         ctx.translate(cx, cy);
@@ -1346,15 +1711,27 @@
           const ang = -Math.PI / 2 + (idx * Math.PI * 2) / count + time * 0.35;
           const sx = Math.cos(ang) * orbitR;
           const sy = Math.sin(ang) * orbitR;
+          const isIconHovered = hoveredIconInfo && hoveredIconInfo.cell === c && hoveredIconInfo.conceptIndex === idx;
+
           ctx.save();
           ctx.translate(sx, sy);
-          drawConceptGlyph(ctx, m.glyphKey, subR, isInverted);
+
+          if (isIconHovered) {
+            ctx.beginPath();
+            ctx.arc(0, 0, subR * 0.62, 0, Math.PI * 2);
+            ctx.strokeStyle = isInverted ? 'rgba(255,255,255,0.8)' : 'rgba(0,0,0,0.75)';
+            ctx.lineWidth = 1.2;
+            ctx.setLineDash([2, 2]);
+            ctx.stroke();
+            ctx.setLineDash([]);
+          }
+
+          drawConceptGlyph(ctx, m.glyphKey, isIconHovered ? subR * 1.12 : subR, isInverted);
           ctx.restore();
         });
         ctx.restore();
       }
 
-      // ETIQUETA PRINCIPAL BAJO EL CÍRCULO
       ctx.save();
       ctx.textAlign = 'center';
       ctx.textBaseline = 'top';
@@ -1395,7 +1772,7 @@
     function animate() {
       updatePhysics();
       drawLoomGrid();
-      drawLoomThreadsAndMetaballs();
+      drawMergePreviewLink();
       drawEffects();
       cells.forEach(c => drawCell(c));
       requestAnimationFrame(animate);
@@ -1406,6 +1783,8 @@
       initParticles();
       initCells();
       isPaused = true;
+      lastActivityTime = performance.now();
+      AudioEngine.startBgm();
       animate();
     };
   </script>
